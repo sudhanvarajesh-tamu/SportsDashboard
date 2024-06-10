@@ -24,13 +24,32 @@ def encode_input_data(label_encoders, team1, team2, venue):
 
 # Define a function to predict the winner
 def predict_winner(label_encoders, model, team1, team2, venue):
+    
+    if team1 not in model.classes_ or team2 not in model.classes_:
+        return random.choice([team1,team2])
+    
     # Encode the input data
     encoded_input = encode_input_data(label_encoders, team1, team2, venue)
     input_data = pd.DataFrame(encoded_input, index=[0])
     
-    # Make prediction
-    winner = model.predict(input_data)
-    return winner[0]
+    predictions_proba = model.predict_proba(input_data)
+    classes = model.classes_
+
+    # Get the indices of Team A and Team B in the classes array
+    team1_index = np.where(classes == team1)[0][0]
+    team2_index = np.where(classes == team2)[0][0]
+
+    # Get the probabilities of Team A and Team B being the winner
+    prob_team1 = predictions_proba[0][team1_index]
+    prob_team2 = predictions_proba[0][team2_index]
+
+    # Choose the winner based on the higher probability
+    if prob_team1 > prob_team2:
+        predicted_winner = team1
+    else:
+        predicted_winner = team2
+
+    return predicted_winner
 
 
 
