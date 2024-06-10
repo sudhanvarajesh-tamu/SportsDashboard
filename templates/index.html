@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Predict Winner:</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        select,
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        .prediction-result {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>Predict Winner</h1>
+    <form id="predictionForm" method="POST" action="/predict">
+        <label for="game">Game:</label>
+        <select id="game" name="game">
+            <option value="Select">Select</option>
+            <option value="Football - World Cup">Football - World Cup</option>
+            <option value="Football - Champions League">Football - Champions League</option>
+            <option value="Cricket - World Cup">Cricket - World Cup</option>
+            <option value="Cricket - IPL">Cricket - IPL</option>
+        </select><br><br>
+
+        <label for="team1">Team 1:</label>
+        <select id="team1" name="team1">
+            <option value="Select">Select Game</option>
+        </select>
+        <br><br>
+        <label for="team2">Team 2:</label>
+        <select id="team2" name="team2">
+            <option value="Select">Select Game</option>
+        </select>
+        <br><br>
+        <label for="venue">Venue:</label>
+        <select id="venue" name="venue">
+            <option value="Select">Select Game</option>
+        </select>
+        <br><br>
+        <input type="submit" value="Predict">
+        
+    </form>
+
+    <div id="predictionResult" class="prediction-result"></div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Include jQuery -->
+    <script>
+        var dropdownOptions = {
+            "Select": {
+                "team1": ['Select Game'],
+                "team2": ['Select Game'],
+                "venues": ['Select Game']
+            },
+            "Football - World Cup": {
+                "team1": ['Chile', 'Algeria', 'Germany', 'England', 'Denmark', 'Japan', 'Egypt', 'Nigeria', 'Saudi Arabia', 'Sweden', 'Peru', 'Switzerland', 'Spain', 'Portugal', 'Honduras', 'Hungary', 'Belgium', 'Ghana', 'South Korea', 'Iran', 'Costa Rica', 'Panama', 'Uruguay', 'Czechoslovakia', 'Netherlands', 'Italy', 'Serbia', 'Mexico', 'Tunisia', 'France', 'Brazil', 'Australia', 'Croatia', 'Greece', 'Iceland', 'Colombia', 'West Germany', 'Bosnia and Herzegovina', 'United States', 'Argentina', 'Russia'],
+                "team2": ['Chile', 'Algeria', 'Germany', 'England', 'Denmark', 'Japan', 'Egypt', 'Nigeria', 'Saudi Arabia', 'Sweden', 'Peru', 'Switzerland', 'Spain', 'Portugal', 'Honduras', 'Hungary', 'Belgium', 'Ghana', 'South Korea', 'Iran', 'Costa Rica', 'Panama', 'Uruguay', 'Czechoslovakia', 'Netherlands', 'Italy', 'Serbia', 'Mexico', 'Tunisia', 'France', 'Brazil', 'Australia', 'Croatia', 'Greece', 'Iceland', 'Colombia', 'West Germany', 'Bosnia and Herzegovina', 'United States', 'Argentina', 'Russia'],
+                "venues": ['Estadio Monumental', 'Stadio Nazionale PNF', 'Kazan Arena', 'Estadio do Maracana', 'Estadio Castelao', 'Estadio Beira-Rio', 'Soccer City Stadium', 'Saint Petersburg Stadium', 'Volgograd Arena', 'Olympiastadion Berlin', 'Estadio Azteca', 'Stade Olympique Yves-du-Manoir', 'Nizhny Novgorod Stadium', 'Ekaterinburg Arena', 'Rostov Arena', 'Arena Pernambuco', 'Estadio Mineirao', 'Stade de France', 'Luzhniki Stadium', 'Wembley Stadium', 'Rose Bowl', 'Santiago Bernabeu', 'Mordovia Arena', 'Estadio Nacional', 'Yokohama International Stadium', 'Wankdorf Stadium', 'Arena Fonte Nova', 'Krestovsky Stadium', 'Otkritie Arena', 'Spartak Stadium', 'Fisht Olympic Stadium', 'Rasunda Stadium', 'Samara Arena', 'Kaliningrad Stadium']
+            },
+            "Football - Champions League": {
+                "team1": ['Arsenal', 'Manchester City', 'AS Monaco', 'Tottenham Hotspur', 'Liverpool', 'Ajax', 'Manchester United', 'Paris Saint-Germain', 'Bayern Munich', 'Bayer Leverkusen', 'Chelsea', 'Monaco', 'Borussia Dortmund', 'Inter Milan', 'Juventus', 'Porto', 'Atletico Madrid', 'Real Madrid', 'Valencia', 'Barcelona', 'AC Milan'],
+                "team2": ['Arsenal', 'Manchester City', 'AS Monaco', 'Tottenham Hotspur', 'Liverpool', 'Ajax', 'Manchester United', 'Paris Saint-Germain', 'Bayern Munich', 'Bayer Leverkusen', 'Chelsea', 'Monaco', 'Borussia Dortmund', 'Inter Milan', 'Juventus', 'Porto', 'Atletico Madrid', 'Real Madrid', 'Valencia', 'Barcelona', 'AC Milan'],
+                "venues": ['Turin', 'Kyiv', 'London', 'Glasgow', 'Istanbul', 'Wembley', 'Rome', 'Paris', 'Moscow', 'Vienna', 'Milan', 'Kiev', 'Manchester', 'Madrid', 'Athens', 'Porto', 'Munich', 'Gelsenkirchen', 'Lisbon', 'Cardiff', 'Berlin', 'Barcelona']
+            },
+            "Cricket - IPL": {
+                "team1": ['Royal Challengers Bangalore', 'Gujarat Lions', 'Kolkata Knight Riders', 'Delhi Daredevils', 'Mumbai Indians', 'Chennai Super Kings', 'Punjab Kings', 'Rising Pune Supergiant', 'Delhi Capitals', 'Kings XI Punjab', 'Rajasthan Royals', 'Sunrisers Hyderabad', 'Deccan Chargers'],
+                "team2": ['Royal Challengers Bangalore', 'Gujarat Lions', 'Kolkata Knight Riders', 'Delhi Daredevils', 'Mumbai Indians', 'Chennai Super Kings', 'Punjab Kings', 'Rising Pune Supergiant', 'Delhi Capitals', 'Kings XI Punjab', 'Rajasthan Royals', 'Sunrisers Hyderabad', 'Deccan Chargers'],
+                "venues": ['Ahmedabad', 'Kolkata', 'Johannesburg', 'Kanpur', 'Bengaluru', 'Mohali', 'Port Elizabeth', 'Sharjah', 'Hyderabad', 'Mumbai', 'Dubai', 'Visakhapatnam', 'Chennai', 'Abu Dhabi', 'Delhi']
+            },
+            "Cricket - World Cup": {
+                "team1": ['Royal Challengers Bangalore', 'Gujarat Lions', 'Kolkata Knight Riders', 'Delhi Daredevils', 'Mumbai Indians', 'Chennai Super Kings', 'Punjab Kings', 'Rising Pune Supergiant', 'Delhi Capitals', 'Kings XI Punjab', 'Rajasthan Royals', 'Sunrisers Hyderabad', 'Deccan Chargers'],
+                "team2": ['Royal Challengers Bangalore', 'Gujarat Lions', 'Kolkata Knight Riders', 'Delhi Daredevils', 'Mumbai Indians', 'Chennai Super Kings', 'Punjab Kings', 'Rising Pune Supergiant', 'Delhi Capitals', 'Kings XI Punjab', 'Rajasthan Royals', 'Sunrisers Hyderabad', 'Deccan Chargers'],
+                "venues": ["Venue P", "Venue Q", "Venue R"]
+            }
+        };
+
+        // Function to populate dropdown options
+        function populateDropdown(dropdownId, options) {
+            var dropdown = document.getElementById(dropdownId);
+            dropdown.innerHTML = '';
+
+            options.forEach(function (option) {
+                var optionElement = document.createElement('option');
+                optionElement.value = option;
+                optionElement.text = option;
+                dropdown.appendChild(optionElement);
+            });
+        }
+
+        // Event listener for game dropdown change
+        document.getElementById('game').addEventListener('change', function () {
+            var selectedGame = this.value;
+            var team1Options = dropdownOptions[selectedGame].team1;
+            var team2Options = dropdownOptions[selectedGame].team2;
+            var venueOptions = dropdownOptions[selectedGame].venues;
+
+            populateDropdown('team1', team1Options);
+            populateDropdown('team2', team2Options);
+            populateDropdown('venue', venueOptions);
+        });
+
+
+        $(document).ready(function() {
+            $("#predictionForm").submit(function(event) {
+                event.preventDefault(); // Prevent form submission
+
+                var formData = {
+                    game: $("#game").val(),
+                    team1: $("#team1").val(),
+                    team2: $("#team2").val(),
+                    venue: $("#venue").val()
+                };
+
+                // Make the prediction request to the server
+                $.post("/predict", formData)
+                    .done(function(response) {
+                        // Access the prediction from the response
+                        var prediction = response.prediction;
+                        
+                        // Display the prediction in the HTML
+                        $("#predictionResult").text("The predicted winner is: \n" + prediction);
+                    })
+                    .fail(function() {
+                        $("#predictionResult").text("Prediction failed. Please try again.");
+                    });
+            });
+        });
+    </script>
+</body>
+
+</html>
