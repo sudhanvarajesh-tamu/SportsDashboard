@@ -1,2 +1,0 @@
-# SportsDashboard
-Tableau sports dashboard
